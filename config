@@ -1,0 +1,183 @@
+################################################################################
+#                          i3 WM CONFIG - OPTIMIZED                           #
+#                     Vim Navigation + Minimalist Design                      #
+################################################################################
+
+# === CORE SETTINGS ===
+set $mod Mod4
+set $term kitty
+set $menu rofi -show drun 
+
+# Font with proper DPI scaling
+font pango:CaskaydiaCove Nerd Font Mono 13
+
+# Floating modifier
+floating_modifier $mod
+
+# === COLORS (Dark + Orange Accent) ===
+set $bg       #000000
+set $fg       #ffffff
+set $accent   #ff1744
+set $dark     #1a1a1a
+set $border   #333333
+
+# client.focused          border    bg       text   indicator
+client.focused          $accent   $dark    $fg    $accent
+client.unfocused        $border   $bg      #888888 $border
+client.focused_inactive $border   $dark    #888888 $border
+client.urgent           $accent   $bg      $fg    $accent
+client.background       $bg
+
+# === WINDOW RULES ===
+default_border pixel 1
+default_floating_border pixel 1
+for_window [class="^.*$"] border pixel 1
+new_window none
+
+# Task manager scratchpad
+for_window [class="task_tui"] floating enable, sticky enable, move scratchpad, resize set 80 ppt 80 ppt
+
+# Floating windows по умолчанию
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [class="Pavucontrol"] floating enable, move position center, resize set 500 400
+for_window [class="Nm-connection-editor"] floating enable, move position center
+for_window [class="anysh"] floating enable, border none
+# === GAPS ===
+gaps top 45
+gaps inner 10
+gaps outer 10
+
+# Smart gaps (no gaps when only one window)
+smart_gaps off
+smart_borders on
+
+################################################################################
+#                            KEYBINDINGS                                       #
+################################################################################
+
+# --- CORE NAVIGATION (VIM) ---
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# --- WINDOW MOVEMENT ---
+bindsym $mod+Shift+h move left 30px
+bindsym $mod+Shift+j move down 30px
+bindsym $mod+Shift+k move up 30px
+bindsym $mod+Shift+l move right 30px
+
+# --- CONTAINER SPLIT (VIM) ---
+bindsym $mod+v split v
+bindsym $mod+s split h
+bindsym $mod+e layout toggle split
+
+# --- WINDOW MANAGEMENT ---
+bindsym $mod+Return exec $term
+bindsym $mod+d exec --no-startup-id $menu
+bindsym $mod+Shift+q kill
+bindsym $mod+f fullscreen toggle
+bindsym $mod+Shift+space floating toggle
+
+# Layout management
+bindsym $mod+w layout tabbed
+bindsym $mod+a layout default
+
+# Focus parent/child
+bindsym $mod+p focus parent
+bindsym $mod+c focus child
+
+# --- SCREENSHOTS ---
+bindsym Print exec --no-startup-id flameshot gui
+bindsym $mod+Print exec --no-startup-id flameshot full -c
+
+# --- TASK MANAGER (Scratchpad) ---
+bindsym $mod+t exec $term --class task_tui -e vit
+bindsym $mod+grave scratchpad show
+
+# --- VOLUME & MEDIA ---
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+
+# --- BRIGHTNESS ---
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+
+# --- WORKSPACES ---
+set $ws1 "1:  "
+set $ws2 "2:  "
+set $ws3 "3:  "
+set $ws4 "4:  "
+set $ws5 "5:  "
+set $ws6 "6:  "
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+
+# Cycle workspaces
+bindsym $mod+Tab workspace next_on_output
+bindsym $mod+Shift+Tab workspace prev_on_output
+
+# --- i3 MANAGEMENT ---
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3?' -b 'Yes, exit i3' 'i3-msg exit'"
+
+################################################################################
+#                          AUTOSTART                                           #
+################################################################################
+
+# Wallpaper
+exec_always --no-startup-id feh --bg-fill ~/Downloads/galaxy1.jpg.jpg
+
+# Compositor
+exec_always --no-startup-id picom --config ~/.config/picom/picom.conf
+
+# Keyboard layout
+exec_always --no-startup-id setxkbmap -layout us,ru -option grp:alt_shift_toggle
+
+# X resources
+exec_always --no-startup-id xrdb -merge ~/.Xresources
+
+# System tray
+exec_always --no-startup-id nm-applet
+exec_always --no-startup-id pasystray
+
+# Kill polybar before restarting
+exec_always --no-startup-id killall polybar || true
+exec_always --no-startup-id sleep 0.5 && polybar macos
+
+# Bar
+exec_always --no-startup-id polybar macos
+
+# Notifications (optional)
+exec_always --no-startup-id dunst &
+
+# Lock screen (optional)
+# bindsym $mod+Escape exec --no-startup-id i3lock -c 000000 # КАКОЕ ЖЕ МРАЗОТНОЕ
+
+################################################################################
+#                      WINDOW ASSIGNMENT (optional)                            #
+################################################################################
+
+# assign [class="Firefox"] $ws2
+# assign [class="Telegram"] $ws3
+# assign [class="discord"] $ws3
+
+################################################################################
+
